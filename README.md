@@ -81,7 +81,11 @@ To avoid compatibility issues, the master nodes, server nodes and client nodes M
 
 ## Library dependencies
 
-There is a default set of Python libraries available on each server node. For any additional library dependencies, the client side is responsible for authoring a `clupy.client.dependency.yaml` file outlining all required libraries that are needed.
+The master node, through the `clupy.master.dependency.yaml` file, defines default set of Python libraries available on all server nodes. Server nodes periodically syncs with the master node(s) to install/upgrade additional libraries if any.
+
+Client nodes will return error or warning if libraries in its environment differ from those of the master node(s).
+
+For any additional library dependencies, the client side is responsible for authoring a `clupy.client.dependency.yaml` file outlining all required libraries that are needed.
 
 # Dependencies
 * [Tornadio](http://www.tornadoweb.org/en/stable/) - a Python web framework and asynchronous networking library
