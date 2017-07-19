@@ -1,5 +1,5 @@
 # CluPy
-[CluPy](https://github.com/xiaohai2016/CluPy) is a simple clustering library and framework for parallel executions in Python. Unlike other prallel processing and clustering technologies, [CluPy](https://github.com/xiaohai2016/CluPy) hides all the clustering delecacies from programmers. A simple wrapping of a function call is sufficient to turn a local function call to be executed in a cluster and thus allowing parallelism among multiple invocations.
+[CluPy](https://github.com/xiaohai2016/CluPy) is a simple library and framework for cluster computation in Python. Unlike other prallel processing and clustering technologies, [CluPy](https://github.com/xiaohai2016/CluPy) hides all the clustering delecacies from programmers. A simple wrapping of a function call is sufficient to turn a local function call to be executed in a cluster and thus allowing parallelism among multiple invocations.
 
 At the same time, resources registraion, management, coordination and system configurations are all designed to be simple and intuitive.
 
@@ -15,7 +15,7 @@ python -m pip install clupy
 2. To start a cluster master node, run:
 ```sh
 # the local clupy.master.yaml file is read if it exists
-python -m clupy master
+python -m clupy --master
 ```
 
 3. To start one or more server nodes, run:
@@ -23,7 +23,7 @@ python -m clupy master
 # the master host's default value is localhost
 # the master host's default port is 7878
 # The local clupy.server.yaml file is loaded if it exists
-python -m clupy serve --master master_server_address --port 7878
+python -m clupy --serve --master-url clupy://master_server_address:7878
 ```
 
 4. From your client codes, to start parallel executions of a method, wrap around the method call with `clupy.parallel(original_method)` to make the local method execute in the cluster:
