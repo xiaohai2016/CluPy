@@ -1,3 +1,3 @@
 port: 0
-server-url: clupy://localhost:{}
-url: clupy://localhost:7878
+server_url: clupy://localhost:{}
+master_url: clupy://localhost:7878

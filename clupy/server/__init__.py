@@ -1,14 +1,23 @@
 """server node module entry point"""
 from __future__ import print_function
 import logging
+import signal
 import tornado.ioloop
 import tornado.web
+from .registration import ServerNodeRegistrationSingleton
 
 class Health(tornado.web.RequestHandler):
     """master server health"""
     def get(self):
         """check health of the server"""
         self.write("iamok")
+
+def on_shutdown(register_service):
+    """ called when user pressed ctrl + C """
+    logger = logging.getLogger('server')
+    logger.info("server node is shutting down")
+    register_service.stop_registration()
+    tornado.ioloop.IOLoop.current().stop()
 
 def run_server():
     """start the server node"""
@@ -35,5 +44,11 @@ def run_server():
         break
     logger.info('Starting server node at port %d', server_config.port) # pylint: disable=E1101
 
+    register_service = ServerNodeRegistrationSingleton(server_config)
+    register_service.start_registration()
 
+    signal.signal(signal.SIGINT, \
+        lambda sig, frame: tornado.ioloop.IOLoop.current().add_callback_from_signal(\
+            on_shutdown, register_service))
     tornado.ioloop.IOLoop.current().start()
+

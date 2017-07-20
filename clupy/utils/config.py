@@ -44,6 +44,18 @@ class BaseConigure(object):
             setattr(type(self), name, property(\
                 lambda self2, nam=name, defv=def_value: self2.get_int_config(nam, defv)))
 
+    def get_string_config(self, name, default_value):
+        """ get string value from the configuration with a default value """
+        return self._config[name] if name in self._config.keys() else default_value
+
+    def define_string_config_properties(self, items):
+        """ define an array of configuration based integer values with defaults """
+        for item in items:
+            name = item[0]
+            def_value = item[1]
+            setattr(type(self), name, property(\
+                lambda self2, nam=name, defv=def_value: self2.get_string_config(nam, defv)))
+
 # provide default values for unconfigured entries
 class MasterConfigure(BaseConigure):
     """Support configuration for master node"""
@@ -55,6 +67,7 @@ class MasterConfigure(BaseConigure):
         self.define_int_config_properties([
             ("port", 7878),
             ("default_server_request_count", 10),
+            ("maintenance_period", 180),
         ])
 
 # provide default values for unconfigured entries
@@ -68,12 +81,17 @@ class ServerConfigure(BaseConigure):
         self.define_int_config_properties([
             ("port", 0),
             ("default_server_request_count", 10),
+            ("failure_retry_interval", 10),
+            ("registration_interval", 200),
+        ])
+        self.define_string_config_properties([
+            ("master_url", "clupy://localhost:7878"),
         ])
 
     @property
-    def serverurl(self):
+    def server_url(self):
         """get the server listening url"""
-        url = self._config['server-url'] if 'server-url' in self._config.keys()\
+        url = self._config['server_url'] if 'server-url' in self._config.keys()\
              else "clupy://localhost:{}"
         return url.format(self.port) # pylint: disable=E1101
 

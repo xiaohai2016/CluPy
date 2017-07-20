@@ -47,19 +47,30 @@ class ServerRegistrationServiceSingleton(object):
         def register_server(self, server_url):
             """ server node registration/update """
             self._logger.info("to register: %s", server_url)
-            self._registrations[server_url] = ServerRegistrationInfo()
+            if not server_url in self._registrations.keys():
+                self._registrations[server_url] = ServerRegistrationInfo()
+            else:
+                self._registrations[server_url].updating_time = datetime.now()
+
+        def unregister_server(self, server_url):
+            """ server node unregistration """
+            self._logger.info("to unregister: %s", server_url)
+            del self._registrations[server_url]
 
         def maintain_servers(self):
             """ server registration maintenance method
             to be invoked on a periodical basis """
+            self._logger.info("periodical maintenance")
             now = datetime.now()
             delta = timedelta(seconds=self._config.registration_ttl)
             expiration = now - delta
+            keys_to_remove = []
             for k, val in self._registrations.items():
-                if val.update_time < expiration:
-                    logging.info("removing server %s from registration, last update %s", \
-                        k, str(val.updating_time))
-                    del self._registrations[k]
+                if val.updating_time < expiration:
+                    keys_to_remove.append(k)
+            for k in keys_to_remove:
+                logging.info("removing server %s from registration", k)
+                del self._registrations[k]
 
         def allocate_server_resources(self, client_id, request_server_count):
             """ server computing resource allocation requests,
@@ -138,6 +149,18 @@ class RegistrationHandler(MasterHandler):
 
         self._service.register_server(server_url)
         response = "{} successfully registered".format(server_url)
+        self._logger.info(response)
+        self.write(response)
+
+class UnegistrationHandler(MasterHandler):
+    """ the handler for /unregister """
+    def get(self, server_url):
+        """ the get request handler """
+        server_url = urlparse(server_url).geturl()
+        self._logger.info("handling unregistration request for %s", server_url)
+
+        self._service.unregister_server(server_url)
+        response = "{} successfully unregistered".format(server_url)
         self._logger.info(response)
         self.write(response)
 
