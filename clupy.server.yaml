@@ -1,2 +1,3 @@
-port: 7877
+port: 0
+server-url: clupy://localhost:{}
 url: clupy://localhost:7878

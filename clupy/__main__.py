@@ -17,8 +17,8 @@ if MAIN_ARGS.server:
 
 if MAIN_ARGS.master:
     from .master import run_server
-    run_server(7878)
+    run_server()
 
 if MAIN_ARGS.server:
     from .server import run_server
-    run_server(7877)
+    run_server()

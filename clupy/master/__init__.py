@@ -3,14 +3,15 @@ from __future__ import print_function
 import logging
 import tornado.ioloop
 import tornado.web
+from .registration import RegistrationHandler, InfoHandler, AllocServerResourcesHandler, RetainServerResourcesHandler
 
-class Mainhandler(tornado.web.RequestHandler):
-    """placeholder handler for now"""
+class Health(tornado.web.RequestHandler):
+    """master server health checking"""
     def get(self):
-        """placeholder routine for now"""
-        self.write("Hello! This is master!")
+        """check the server health"""
+        self.write("iamok")
 
-def run_server(port):
+def run_server():
     """starting the master server"""
     # Enforce the existence of the clupy.master.yaml
     from ..utils.config import MasterConfigure
@@ -25,8 +26,12 @@ def run_server(port):
     logger = logging.getLogger('master')
 
     application = tornado.web.Application([
-        (r"/", Mainhandler)
+        (r"/health", Health),
+        (r"/register/(.*)", RegistrationHandler, dict(config=master_config)),
+        (r"/info", InfoHandler, dict(config=master_config)),
+        (r"/alloc/(.*)/(.*)", AllocServerResourcesHandler, dict(config=master_config)),
+        (r"/retain/(.*)/(.*)", RetainServerResourcesHandler, dict(config=master_config)),
     ])
-    application.listen(master_config.port)
-    logger.info('Starting master at port {}'.format(master_config.port))
+    application.listen(master_config.port) # pylint: disable=E1101
+    logger.info('Starting master at port %d', master_config.port) # pylint: disable=E1101
     tornado.ioloop.IOLoop.current().start()

@@ -4,13 +4,13 @@ import logging
 import tornado.ioloop
 import tornado.web
 
-class Mainhandler(tornado.web.RequestHandler):
-    """placeholder hadler for now"""
+class Health(tornado.web.RequestHandler):
+    """master server health"""
     def get(self):
-        """placeholder routine for now"""
-        self.write("Hello! This is a server node!")
+        """check health of the server"""
+        self.write("iamok")
 
-def run_server(port):
+def run_server():
     """start the server node"""
     # Enforce the existence of the clupy.server.yaml
     from ..utils.config import ServerConfigure
@@ -25,8 +25,15 @@ def run_server(port):
     logger = logging.getLogger('master')
 
     application = tornado.web.Application([
-        (r"/", Mainhandler)
+        (r"/health", Health)
     ])
-    application.listen(server_config.port)
-    logger.info('Starting master at port {}'.format(server_config.port))
+    sockets = tornado.netutil.bind_sockets(server_config.port) # pylint: disable=E1101
+    server = tornado.httpserver.HTTPServer(application)
+    server.add_sockets(sockets)
+    for sock in sockets:
+        server_config.config['port'] = sock.getsockname()[1]
+        break
+    logger.info('Starting server node at port %d', server_config.port) # pylint: disable=E1101
+
+
     tornado.ioloop.IOLoop.current().start()
