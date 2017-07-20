@@ -19,7 +19,7 @@ def on_shutdown(register_service):
     register_service.stop_registration()
     tornado.ioloop.IOLoop.current().stop()
 
-def run_server():
+def run_server(args):
     """start the server node"""
     # Enforce the existence of the clupy.server.yaml
     from ..utils.config import ServerConfigure
@@ -28,6 +28,8 @@ def run_server():
         print("Error: {} file is not found".format(config_file))
         return
     server_config = ServerConfigure(config_file)
+    if args.master_url:
+        server_config.config['master_url'] = args.master_url
 
     format_string = '%(asctime)-15s, %(message)s'
     logging.basicConfig(format=format_string, level=logging.INFO)

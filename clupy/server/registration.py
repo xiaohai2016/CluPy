@@ -73,6 +73,8 @@ class ServerNodeRegistrationSingleton(object):
                 http_client.fetch(master_url)
             except HTTPError as err:
                 self._logger.error("stopping server node registration error: %s", str(err))
+            except ConnectionRefusedError as conn_err: # pylint: disable=E0602
+                self._logger.error("Connection error: %s", str(conn_err))
             http_client.close()
             self._stopped = True
 

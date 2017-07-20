@@ -21,7 +21,7 @@ def on_shutdown():
     logger.info("master server is shutting down")
     tornado.ioloop.IOLoop.current().stop()
 
-def run_server():
+def run_server(args):
     """starting the master server"""
     # Enforce the existence of the clupy.master.yaml
     from ..utils.config import MasterConfigure
