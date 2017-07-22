@@ -88,12 +88,12 @@ Client nodes will return error or warning if libraries in its environment differ
 For any additional library dependencies, the client side is responsible for authoring a `clupy.client.dependency.yaml` file outlining all required libraries that are needed.
 
 # Dependencies
-* [Tornadio](http://www.tornadoweb.org/en/stable/) - a Python web framework and asynchronous networking library
+* [Tornado](http://www.tornadoweb.org/en/stable/) - a Python web framework and asynchronous networking library
 
 # Authors
 * [Xiaohai Zhang](https://xiaohaionline.com)
 
 # Links
 * [ParallelProcessing](https://wiki.python.org/moin/ParallelProcessing) - a Python WIKI page regarding parallel processing in Python
-* [Tornadio](http://www.tornadoweb.org/en/stable/) - a Python web framework and asynchronous networking library
+* [Tornado](http://www.tornadoweb.org/en/stable/) - a Python web framework and asynchronous networking library
 
