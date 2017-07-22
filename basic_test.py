@@ -22,10 +22,11 @@ def parallel_execution():
     results = [clupy.parallel(primes, server_count=1)(n) for n in range(10000, 10002)]
     clupy.wait_all(results, time_out=10)
     for res in results:
-        if res.successful:
-            print("results: ", res.value)
-        else:
-            print("failure: ", res.failure)
+        if res.completed:
+            if res.value:
+                print("results: ", res.value)
+            elif res.failure:
+                print("failure: ", res.failure)
 
     clupy.stop_remote_execution()
 
