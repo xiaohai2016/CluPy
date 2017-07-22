@@ -5,6 +5,7 @@ import signal
 import tornado.ioloop
 import tornado.web
 from .registration import ServerNodeRegistrationSingleton
+from .execution import CreateSandboxHandler, ExecuteFunctionHandler
 
 class Health(tornado.web.RequestHandler):
     """master server health"""
@@ -36,7 +37,9 @@ def run_server(args):
     logger = logging.getLogger('master')
 
     application = tornado.web.Application([
-        (r"/health", Health)
+        (r"/health", Health),
+        (r"/exec/create/(.*)/(.*)", CreateSandboxHandler, dict(config=server_config)),
+        (r"/exec/run/(.*)", ExecuteFunctionHandler, dict(config=server_config)),
     ])
     sockets = tornado.netutil.bind_sockets(server_config.port) # pylint: disable=E1101
     server = tornado.httpserver.HTTPServer(application)

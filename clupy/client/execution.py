@@ -8,7 +8,9 @@ import os
 import threading
 from datetime import datetime
 import queue
-from tornado.httpclient import HTTPClient, HTTPError
+import urllib
+import base64
+from tornado.httpclient import HTTPClient, HTTPError, AsyncHTTPClient
 from tornado.ioloop import IOLoop
 from tornado import gen
 
@@ -49,7 +51,7 @@ class RemoteExecutionServiceSingleton(object):
             RemoteExecutionServiceSingleton.instance = \
                 RemoteExecutionServiceSingleton.RemoteExecutionService()
             RemoteExecutionServiceSingleton.client_id = socket.gethostname() \
-                    + ":" + str(os.getpid())
+                    + "_" + str(os.getpid())
         return RemoteExecutionServiceSingleton.instance
 
     def __getattr__(self, name):
@@ -138,9 +140,33 @@ class RemoteExecutionServiceSingleton(object):
                 """ execute one function call against one given server,
                     use tornado coroutine to simplify the asynchronous
                     programming logic
+                    1. Ask the server to create a execution sandbox context if not yet done
+                    2. Check file modifications and upload all modified source codes
+                    3. For tagged inputs, e.g. iteration source, transform and prepare the data
+                    4. Post the data and request remote execution, wait for the result
+                    5. For tagged outputs, transform and deposit the data
+                    6. Ship over the logs/backtrack traces and other execution information
+                    7. Return the calculated outputs
                 """
                 self._logger.info("execute single call invoked")
-                return
+
+                server_url = server_entry.server_url.replace("clupy://", "http://").rstrip("/")
+                server_url = server_url + "/exec"
+                http_client = AsyncHTTPClient()
+                if not server_entry.sandbox_id:
+                    request_url = server_url + "/create/" + urllib.parse.quote(\
+                            RemoteExecutionServiceSingleton.client_id) + "/1"
+                    response = yield http_client.fetch(request_url)
+                    server_entry.sandbox_id = response.body.decode("utf-8")
+                request_url = server_url + "/run/" + server_entry.sandbox_id
+                body_val = {
+                    "file_name": call_context.source_file,
+                    "func_name": call_context.func_name,
+                    "input_data": base64.standard_b64encode(pickle.dumps(call_context.input_data))
+                }
+                body = urllib.parse.urlencode(body_val)
+                response = yield http_client.fetch(request_url, method="POST", body=body)
+                return pickle.loads(base64.standard_b64decode(response.body))
 
             def complete_single_execution(self, result, excep, call_context, server_entry):  # pylint: disable=W0613
                 """ mark the completion of a single execution"""
@@ -232,6 +258,7 @@ class RemoteServerInfo(object):
     def __init__(self, url):
         self.server_url = url
         self.one_execution_context = None
+        self.sandbox_id = None
         self.last_activity_time = datetime.now()
 
 class RemoteFunctionContext(object):
