@@ -79,12 +79,13 @@ def primes(n):
 if __name__ == "__main__":
   # The client configure information is read off the local clupy.client.yaml file if exists
   results = [clupy.parallel(primes, max=10)(n) for n in range(100, 200)]
-  clupy.wait_all(time_out=10s, results)
-  for r in results:
-    if r.successful:
-      print(r.value)
-    else:
-      print(r.failure)
+  clupy.wait_all(results, time_out=10s)
+  for res in results:
+    if res.completed:
+        if not res.value is None:
+            print("results: ", res.value)
+        elif not res.failure is None:
+            print("failure: ", res.failure)
 ```
 
 On the client side, you can also use the following calling style
