@@ -78,7 +78,7 @@ def primes(n):
 
 if __name__ == "__main__":
   # The client configure information is read off the local clupy.client.yaml file if exists
-  results = [clupy.parallel(primes, max=10)(n) for n in range(100, 200)]
+  results = [clupy.parallel(primes, server_count=10)(n) for n in range(100, 200)]
   clupy.wait_all(results, time_out=10)
   for res in results:
     if res.completed:
@@ -91,10 +91,10 @@ if __name__ == "__main__":
 On the client side, you can also use the following calling style
 ```python
 if __name__ == "__main__":
-  results = [clupy.parallel(primes, max=10)(n) for n in range(100, 200)]
+  results = [clupy.parallel(primes, server_count=10)(n) for n in range(100, 200)]
   for r in results:
     r.succeed(x: print(x)).fail(x: print(x))
-  clupy.wait_all(time_out=10s, results)
+  clupy.wait_all(results, time_out=10)
 ```
 
 When a function is wrapped with `clupy.parallel(original_method)`, the real return value of the wrapped function is changed into a `Future` object encapsulating the original return value and possibly some failure information (exceptions thrown). The `Future` class has the following prototype:
