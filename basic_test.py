@@ -2,6 +2,8 @@
 from __future__ import print_function
 import logging
 import clupy
+import pickle
+import base64
 
 def primes(num):
     """ find prime factors of num """
@@ -11,24 +13,25 @@ def primes(num):
 
 def plain_execution():
     """ simple & old fasioned serialized execution """
-    results = [primes(n) for n in range(10000, 10002)]
-    print(results)
+    results = [primes(n) for n in range(10000, 10009)]
+    print('plain: ', results)
 
 def parallel_execution():
     """ new parallel execution model """
-    logging.basicConfig(level=logging.INFO)
+    #logging.basicConfig(level=logging.INFO)
     clupy.set_master_url("clupy://localhost:7878")
 
-    results = [clupy.parallel(primes, server_count=1)(n) for n in range(10000, 10002)]
+    results = [clupy.parallel(primes, server_count=2)(n) for n in range(10000, 10009)]
     clupy.wait_all(results, time_out=10)
     for res in results:
         if res.completed:
-            if res.value:
+            if not res.value is None:
                 print("results: ", res.value)
-            elif res.failure:
+            elif not res.failure is None:
                 print("failure: ", res.failure)
 
     clupy.stop_remote_execution()
 
 if __name__ == "__main__":
+    plain_execution()
     parallel_execution()
