@@ -1,9 +1,50 @@
 # CluPy
-[CluPy](https://github.com/xiaohai2016/CluPy) is a simple library and framework for cluster computation in Python. Unlike other prallel processing and clustering technologies, [CluPy](https://github.com/xiaohai2016/CluPy) hides all the clustering delecacies from programmers. A simple wrapping of a function call is sufficient to turn a local function call to be executed in a cluster and thus allowing parallelism among multiple invocations.
+[CluPy](https://github.com/xiaohai2016/CluPy) is a simple library and framework for running Machine Learning algorithms in Python clusters. Unlike other cluster technologies, [CluPy](https://github.com/xiaohai2016/CluPy) requires minimum amount of efforts from data scientists, i.e. a simple wrapping of a function call is sufficient to automatically trigger large scale parallel executions. It also supports a number of other important features for data scientists such as simple service deployments and efficient resource sharing and flow coordination among modules.
 
-At the same time, resources registraion, management, coordination and system configurations are all designed to be simple and intuitive.
+# Major Features
 
-Built upon the success of [Redis](https://redis.io/) and [Zookeeper](https://zookeeper.apache.org/), [CluPy](https://github.com/xiaohai2016/CluPy) also provides simplified and yet efficient set of APIs for data sharing and multiprocess coordination/synchronization.
+## Simple Parallel Execution
+
+Suppose you have a computation-intensive routine `expensive_computation(args)` that you would like to execute on multiple machines in parallel. With [CluPy](https://github.com/xiaohai2016/CluPy), you simply need the following line of code to invoke the computation 100 times over 50 computers.
+
+```python
+results = [clupy.parallel(expensive_computation, server_count=50)(args) for _ in range(100)]
+```
+
+## Simple Service Deployment
+
+Suppose you successfully developed a model that does face recognition, and you'd like to deploy it to be used by the general public. You simply need to define a service file with the following contents:
+
+```python
+import clupy
+
+clupy.service(
+    packages=[list_of_dependent_packages],
+    entry_points=[list_of_module_dot_function_name],
+    port=8080
+    )
+```
+
+and submit to a [CluPy](https://github.com/xiaohai2016/CluPy) cluster by a command:
+```sh
+python -m clupy --publish your_service.py --master-url your-cluster-url
+```
+
+The rest, e.g. input/output parameter marshaling, endpoint publishing, package installation, status monitoring, metrics collection etc. are all automatically handled by the framework.
+
+## Efficient Data Sharing
+
+For each [CluPy](https://github.com/xiaohai2016/CluPy) cluster, with simple configuration changes in the cluster, data scientists can gain access to a [Redis](https://redis.io/) based file store. One can import or export CSV, Parquet files from and into it with ease(just like regular files). Since [Redis](https://redis.io/) is memory based, the data sharing among modules are efficient.
+
+The framework intelligently takes care of cleaning up of stale/unused data to ensure the healthy of the [Redis](https://redis.io/) cluster.
+
+## Reliable Flow Coordinate & Synchronization
+
+This is achieved by relying and exposing capabilities from well tested [Zookeeper](https://zookeeper.apache.org/) clusters.
+
+## Highly Parallel Depp Learning Libraries and TensorFlow Integration
+
+Being planned.
 
 # Getting Started
 
