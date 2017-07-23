@@ -97,9 +97,9 @@ if __name__ == "__main__":
   clupy.wait_all(results, time_out=10)
 ```
 
-When a function is wrapped with `clupy.parallel(original_method)`, the real return value of the wrapped function is changed into a `Future` object encapsulating the original return value and possibly some failure information (exceptions thrown). The `Future` class has the following prototype:
+When a function is wrapped with `clupy.parallel(original_method)`, the real return value of the wrapped function is changed into a `RemoteExecutionFuture` object encapsulating the original return value and possibly some failure information (exceptions thrown). The `RemoteExecutionFuture` class has the following prototype:
 ```python
-class Future(object):
+class RemoteExecutionFuture(object):
   def __init__(self):
     # a boolean indicating success or failure
     self.successful = False
@@ -111,7 +111,7 @@ class Future(object):
   def fail(self, lambda):
     # Upon completion and a failure, executes the lambda function with the failure information
     # and returns the same Future object
-  def wait(self, timeout=10s):
+  def wait(self, timeout=10):
     # Wait for the completion of the execution with a timeout
 ```
 
