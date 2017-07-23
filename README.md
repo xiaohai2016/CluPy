@@ -79,7 +79,7 @@ def primes(n):
 if __name__ == "__main__":
   # The client configure information is read off the local clupy.client.yaml file if exists
   results = [clupy.parallel(primes, max=10)(n) for n in range(100, 200)]
-  clupy.wait_all(results, time_out=10s)
+  clupy.wait_all(results, time_out=10)
   for res in results:
     if res.completed:
         if not res.value is None:
