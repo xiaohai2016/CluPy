@@ -38,11 +38,11 @@ For each [CluPy](https://github.com/xiaohai2016/CluPy) cluster, with simple conf
 
 The framework intelligently takes care of cleaning up of stale/unused data to ensure the healthy of the [Redis](https://redis.io/) cluster.
 
-## Reliable Flow Coordinate & Synchronization
+## Reliable Flow Coordination & Synchronization
 
 This is achieved by relying and exposing capabilities from well tested [Zookeeper](https://zookeeper.apache.org/) clusters.
 
-## Highly Parallel Depp Learning Libraries and TensorFlow Integration
+## Highly Parallel Deep Learning Libraries and TensorFlow Integration
 
 Being planned.
 
